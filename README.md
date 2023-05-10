@@ -113,18 +113,51 @@ In the tasks table, you can add, edit, or delete scheduled tasks. Each task has 
 
 ## Usage
 
-To run scheduled tasks, you need to call the `cron:job` command with the `task_group` argument, which specifies the name of the group of tasks to be run. For example:
+To use the `CronJobCommand`, you need to have some tasks defined in the tasks table of your database. Each task has a name, a group, a command, a schedule, a status, and a last run time. The name is a unique identifier for the task. The group is a way to categorize tasks and run them together. The command is the actual code that will be executed when the task is run. The schedule is a cron expression that defines when the task should run. The status is either active or inactive, indicating whether the task is enabled or disabled. The last run time is a timestamp that records when the task was last executed.
+
+To run a task group, you need to use the cronjob:run command with the name of the group as an argument. For example, if you have a group called daily, you can run it with:
+```sh
+php spark cronjob:run daily
+```
+This will execute all the tasks in the daily group that match the current time according to their schedule. If you want to run all the tasks in all groups, you can use the all argument:
 
 ```sh
-php spark cron:job email
+php spark cronjob:run all
 ```
-This command will run all enabled tasks from the email group on a schedule.
-You can add this command to your server's crontab so that it runs automatically at a certain frequency. For example, you can add the following line to crontab:
+This will execute all the tasks in all groups that match the current time according to their schedule.
+You can also use some options when running the cronjob:run command. These options are:
+ - -f or --force: This option will force all tasks in the group to run regardless of their schedule or status.
+ - -d or --dry-run: This option will only display what tasks would be run without actually executing them.
+ - -v or --verbose: This option will display more information about each task that is run, such as its name, command, schedule, status, and last run time.
+
+For example, if you want to force all tasks in the weekly group to run and display more information about them, you can use:
 
 ```sh
-* * * * * php /path/to/your/project/spark cron:job email
+php spark cronjob:run weekly -f -v
 ```
-This line means that the command will run every minute and perform tasks from the email group.
+This will output something like this:
+
+```text
+Running task group: weekly
+
+Task name: backup_database
+Task command: php spark db:backup -all -zip
+Task schedule: 0 0 * * 0
+Task status: active
+Task last run time: 2023-05-07 00:00:00
+Running task...
+Task completed.
+
+Task name: send_report_email
+Task command: php spark email:send report@example.com "Weekly Report" "report.html"
+Task schedule: 0 8 * * 1
+Task status: inactive
+Task last run time: 2023-05-01 08:00:00
+Running task...
+Task completed.
+
+Done.
+```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
