@@ -15,8 +15,8 @@ class CronJobModel extends Model
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        "preset_id",
-        "task_title",
+        "task_name",
+        "task_last_run",
         "task_command",
         "task_schedule",
         "task_status",

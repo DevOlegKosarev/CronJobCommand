@@ -3,6 +3,7 @@
 namespace App\Database\Migrations;
 
 use CodeIgniter\Database\Migration;
+use CodeIgniter\CLI\CLI;
 
 /**
  * Class CronJobs
@@ -41,15 +42,11 @@ class CronJobs extends Migration
                     'unsigned'       => true,
                     'auto_increment' => true,
                 ],
-                'preset_id' => [
-                    'type'           => 'INT',
-                    'constraint'     => 5
-                ],
-                'task_title' => [
+                'task_name' => [
                     'type'       => 'VARCHAR',
                     'constraint' => '255',
                 ],
-                'task_vendor' => [
+                'task_group' => [
                     'type'       => 'VARCHAR',
                     'constraint' => '255',
                 ],
@@ -61,11 +58,9 @@ class CronJobs extends Migration
                     'type'       => 'VARCHAR',
                     'constraint' => '255',
                 ],
-                // Rename and move the field here
                 'task_last_run' => [
                     'type'       => 'DATETIME'
                 ],
-                // Move this field after the renamed one
                 'task_status' => [
                     'type'           => 'ENUM',
                     'constraint'     => ['enabled', 'disabled'],

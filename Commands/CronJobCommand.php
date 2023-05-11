@@ -44,7 +44,7 @@ class CronJobCommand extends BaseCommand
      *
      * @var string
      */
-    protected $usage = 'cron:job <task_group>';
+    protected $usage = 'cron:job <task_group> [options]';
 
     /**
      * The Command's Arguments
@@ -88,13 +88,13 @@ class CronJobCommand extends BaseCommand
             // $tasks = $CronJobModel->where('task_status', 'enabled')->where('task_group', $task_group)->findAll();
 
             // Parse the command line options
-            $options = getopt("vdf", ["verbose", "dry-run", "force"]);
+            $options = $_SERVER['argv'];
             // Check if the verbose option is set
-            $verbose = isset($options["v"]) || isset($options["verbose"]);
+            $verbose = in_array('-v', $options) || in_array('--verbose', $options) ? true : false;
             // Check if the dry-run option is set
-            $dry_run = isset($options["d"]) || isset($options["dry-run"]);
+            $dry_run = in_array('-d', $options) || in_array('--dry-run', $options) || in_array('–-dry-run', $options) ? true : false;
             // Check if the force option is set
-            $force = isset($options["f"]) || isset($options["force"]);
+            $force = in_array('-f', $options) || in_array('--force', $options) ? true : false;
 
             // Create an instance of the CronJobModel and query for the enabled tasks for the group
             $CronJobModel = new Models\CronJobModel();
@@ -115,7 +115,8 @@ class CronJobCommand extends BaseCommand
             $tasksShellArray = [];
             // Get the current time
             $current_time = time();
-
+            CLI::write("Running task group: $task_group", "yellow");
+            CLI::newLine();
             foreach ($tasks as $keyTask => $task) {
                 // If not dry-run, update the task last run time
                 if (!$dry_run) {
@@ -149,6 +150,9 @@ class CronJobCommand extends BaseCommand
                         }
                     }
                 }
+                CLI::write("Running task...", "yellow");
+                CLI::write("Task completed.");
+                CLI::newLine();
             }
             // Get the number of commands in the array
             $tasksShellCount = count($tasksShellArray);
@@ -159,6 +163,7 @@ class CronJobCommand extends BaseCommand
                 // If not dry-run, execute the commands
                 if (!$dry_run) {
                     exec($tasksShellStr);
+                    exit();
                 }
             } else {
                 CLI::write("No tasks for group $task_group found to run", 'green');
